@@ -18,13 +18,56 @@ function ensureLogDir() {
   }
 }
 
+function sanitizeExtra(extra: LogExtra): LogExtra {
+  if (!extra || typeof extra !== 'object') {
+    return extra;
+  }
+
+  const sensitiveKeys = [
+    'masterkey',
+    'workingkey',
+    'value',
+    'validation',
+    'token',
+    'authorization',
+    'password',
+    'secret',
+  ];
+
+  const clone = JSON.parse(JSON.stringify(extra));
+
+  const walk = (obj: unknown): void => {
+    if (!obj || typeof obj !== 'object') {
+      return;
+    }
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const key of Object.keys(obj as Record<string, unknown>)) {
+      const lowerKey = key.toLowerCase();
+      const target = (obj as Record<string, unknown>)[key];
+
+      if (sensitiveKeys.includes(lowerKey)) {
+        // eslint-disable-next-line no-param-reassign
+        (obj as Record<string, unknown>)[key] = '[REDACTED]';
+      } else {
+        walk(target);
+      }
+    }
+  };
+
+  walk(clone);
+  return clone as LogExtra;
+}
+
 export function logError(context: string, error: unknown, extra?: LogExtra) {
   ensureLogDir();
+
+  const safeExtra = sanitizeExtra(extra);
 
   const base = {
     timestamp: new Date().toISOString(),
     context,
-    extra: extra ?? undefined,
+    extra: safeExtra ?? undefined,
   };
 
   const errorPayload =
@@ -69,7 +112,7 @@ export function logError(context: string, error: unknown, extra?: LogExtra) {
         message,
         name,
         stack,
-        extra: extra ?? undefined,
+        extra: safeExtra ?? undefined,
       },
     })
     .catch(() => {
