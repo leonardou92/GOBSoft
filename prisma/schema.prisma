@@ -1,0 +1,29 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model BankAccount {
+  id            Int      @id @default(autoincrement())
+  clientId      String   // RIF del cliente (BNC_CLIENT_ID, BNC_CHILD_CLIENT_ID, etc.)
+  accountNumber String   @unique
+  alias         String?  // Nombre amigable de la cuenta (opcional)
+  bankCode      Int      // Código del banco (ej. 191 para BNC)
+
+  // Número de Pago Móvil asociado a esta cuenta (ej: 584241234567)
+  mobPaymentPhone String? // null si la cuenta no está afiliada a Pago Móvil
+
+  isActive      Boolean  @default(true)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
