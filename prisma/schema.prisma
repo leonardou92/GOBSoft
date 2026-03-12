@@ -26,4 +26,33 @@ model BankAccount {
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  transactions  BankTransaction[]
+}
+
+model BankTransaction {
+  id             Int      @id @default(autoincrement())
+  bankAccountId  Int
+  bankAccount    BankAccount @relation(fields: [bankAccountId], references: [id])
+
+  accountNumber  String
+  movementDate   DateTime
+  controlNumber  String
+  amount         Float
+  code           String
+  bankCode       String
+  debtorInstrument String?
+  concept        String
+  type           String
+  balanceDelta   String
+  referenceA     String?
+  referenceB     String?
+  referenceC     String?
+  referenceD     String?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([bankAccountId])
+  @@unique([bankAccountId, referenceA, amount, movementDate, type])
 }
