@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
+import { logError } from '../utils/logger';
 
 const router = Router();
 
@@ -40,7 +41,7 @@ router.post('/', async (req, res) => {
       });
     }
 
-    console.error('Error creando cuenta bancaria', error);
+    logError('bank-accounts/create', error, { body: req.body });
     return res.status(500).json({ message: 'Error creando cuenta bancaria.' });
   }
 });
@@ -57,7 +58,7 @@ router.get('/', async (req, res) => {
 
     return res.json(accounts);
   } catch (error) {
-    console.error('Error listando cuentas bancarias', error);
+    logError('bank-accounts/list', error);
     return res.status(500).json({ message: 'Error listando cuentas bancarias.' });
   }
 });
@@ -80,7 +81,7 @@ router.get('/:id', async (req, res) => {
 
     return res.json(account);
   } catch (error) {
-    console.error('Error obteniendo cuenta bancaria', error);
+    logError('bank-accounts/get', error, { params: req.params });
     return res.status(500).json({ message: 'Error obteniendo cuenta bancaria.' });
   }
 });
@@ -127,7 +128,7 @@ router.put('/:id', async (req, res) => {
       });
     }
 
-    console.error('Error actualizando cuenta bancaria', error);
+    logError('bank-accounts/update', error, { params: req.params, body: req.body });
     return res.status(500).json({ message: 'Error actualizando cuenta bancaria.' });
   }
 });
@@ -150,7 +151,7 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Cuenta no encontrada.' });
     }
 
-    console.error('Error eliminando cuenta bancaria', error);
+    logError('bank-accounts/delete', error, { params: req.params });
     return res.status(500).json({ message: 'Error eliminando cuenta bancaria.' });
   }
 });

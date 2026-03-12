@@ -2,6 +2,7 @@ import { Router } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { marked } from 'marked';
+import { logError } from '../utils/logger';
 
 const router = Router();
 
@@ -18,7 +19,7 @@ router.get('/context', async (_req, res) => {
       html,
     });
   } catch (error) {
-    console.error('Error leyendo PROJECT_CONTEXT.md', error);
+    logError('docs/context', error);
     return res.status(500).json({
       message: 'No se pudo leer el contexto del proyecto.',
     });

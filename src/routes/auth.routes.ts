@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { decryptJson, encryptJson } from '../utils/bncCrypto';
+import { logError } from '../utils/logger';
 
 const router = Router();
 
@@ -48,7 +49,7 @@ router.post('/login', async (req, res) => {
       rawResponse: data,
     });
   } catch (error) {
-    console.error('Error llamando al endpoint de login del BNC', error);
+    logError('auth/login', error);
     return res.status(500).json({
       message: 'No se pudo ejecutar el login contra el BNC.',
     });
@@ -114,7 +115,7 @@ router.post('/login-simple', async (_req, res) => {
       decrypted,
     });
   } catch (error) {
-    console.error('Error llamando al endpoint de login-simple del BNC', error);
+    logError('auth/login-simple', error);
     return res.status(500).json({
       message: 'No se pudo ejecutar el login-simple contra el BNC.',
     });

@@ -5,6 +5,8 @@ import docsRouter from './routes/docs.routes';
 import accountRouter from './routes/account.routes';
 import authRouter from './routes/auth.routes';
 import bankAccountsRouter from './routes/bankAccounts.routes';
+import transactionsRouter from './routes/transactions.routes';
+import associatesRouter from './routes/associates.routes';
 
 dotenv.config();
 
@@ -22,6 +24,8 @@ export const createApp = (): Application => {
   app.use('/api/account', accountRouter);
   app.use('/api/auth', authRouter);
   app.use('/api/bank-accounts', bankAccountsRouter);
+  app.use('/api/transactions', transactionsRouter);
+  app.use('/api/associates', associatesRouter);
 
   return app;
 };

@@ -12,6 +12,12 @@ datasource db {
   provider = "mysql"
 }
 
+enum TransactionKind {
+  TRF
+  DEP
+  P2P
+}
+
 model BankAccount {
   id            Int      @id @default(autoincrement())
   clientId      String   // RIF del cliente (BNC_CLIENT_ID, BNC_CHILD_CLIENT_ID, etc.)
@@ -50,9 +56,49 @@ model BankTransaction {
   referenceC     String?
   referenceD     String?
 
+  // Tipo lógico de la transacción (Transferencia, Depósito, Pago Móvil, etc.)
+  kind           TransactionKind @default(TRF)
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   @@index([bankAccountId])
   @@unique([bankAccountId, referenceA, amount, movementDate, type])
+}
+
+model AssociatedClient {
+  id            Int      @id @default(autoincrement())
+  childClientId String   @unique // RIF del asociado (ChildClientID)
+  name          String
+  description   String?
+  isActive      Boolean  @default(true)
+
+  branches      Branch[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Branch {
+  id                Int              @id @default(autoincrement())
+  code              String           // BranchID (ej: CS400)
+  name              String
+  associatedClientId Int
+  associatedClient  AssociatedClient @relation(fields: [associatedClientId], references: [id])
+  isActive          Boolean          @default(true)
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@unique([associatedClientId, code])
+}
+
+model ApiErrorLog {
+  id        Int      @id @default(autoincrement())
+  context   String
+  message   String
+  name      String?
+  stack     String?
+  extra     Json?
+  createdAt DateTime @default(now())
 }
