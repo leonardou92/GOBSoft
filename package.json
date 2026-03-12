@@ -1,5 +1,5 @@
 {
-  "name": "api-bnc",
+  "name": "bnc-api-backend",
   "version": "1.0.0",
   "description": "Pega aquí la descripción completa de tu proyecto backend (contexto funcional, módulos, dependencias, etc.).",
   "main": "dist/server.js",

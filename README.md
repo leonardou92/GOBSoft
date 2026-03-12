@@ -1,4 +1,4 @@
-## API-BNC Backend (Resumen Técnico)
+## BNC API Backend (Resumen Técnico)
 
 Este proyecto es un backend en Node.js/TypeScript que actúa como **intermediario seguro** entre clientes internos y la **API de integración del Banco Nacional de Crédito (BNC)**.  
 Su objetivo es exponer endpoints legibles (sin encriptación) y encargarse internamente de:
@@ -180,7 +180,7 @@ Para detalles completos sobre el comportamiento criptográfico y los endpoints e
 
    ```bash
    git clone <URL_DE_TU_REPO_PRIVADO>
-   cd Api-BNC
+   cd bnc-api-backend
    ```
 
 3. **Instalar dependencias**
