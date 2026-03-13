@@ -32,7 +32,7 @@ Su objetivo es exponer endpoints legibles (sin encriptación) y encargarse inter
 
 ### Entidades principales en base de datos (Prisma)
 
-- **`BankAccount`**: Cuentas bancarias locales (clientId, número de cuenta, alias, banco, teléfono de pago móvil, etc.).
+- **`BankAccount`**: Cuentas bancarias locales (clientId, número de cuenta, alias, banco, teléfono de pago móvil, etc).
 - **`BankTransaction`**: Movimientos asociados a cuentas (`TransactionKind` = `TRF`, `DEP`, `P2P`), con metadata (referencias, tipo, código, etc.).
 - **`AssociatedClient`**: Clientes asociados (ChildClientID), activos/inactivos.
 - **`Branch`**: Sucursales de asociados (BranchID).
