@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 95%; /* Off-White (#F2F2F2) */
+    --foreground: 220 18% 13%; /* Off-Black (#1B1F25) */
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 18% 13%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 18% 13%;
+
+    /* Primario vibrante: naranja de marca */
+    --primary: 23 100% 53%; /* Aproximación de #FF6C0E */
+    --primary-foreground: 0 0% 100%;
+
+    /* Neutros claros / grises suaves */
+    --secondary: 204 4% 81%; /* Aproximación de #D0D2D3 */
+    --secondary-foreground: 220 18% 13%;
+
+    --muted: 204 4% 81%;
+    --muted-foreground: 210 4% 45%; /* Cercano a #76797C */
+
+    /* Acento amarillo para CTAs secundarios */
+    --accent: 46 100% 57%; /* Aproximación de #FFC629 */
+    --accent-foreground: 220 18% 13%;
+
+    /* Destructivo: dejamos el rojo estándar */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Éxito: verde Fresh Green */
+    --success: 149 100% 35%; /* Aproximación de #00B451 */
+    --success-foreground: 0 0% 100%;
+
+    /* Bordes / inputs con gris claro de la paleta */
+    --border: 204 4% 81%;
+    --input: 204 4% 81%;
+    --ring: 23 100% 53%;
+
+    --radius: 0.5rem;
+
+    /* Sidebar basada en los neutros oscuros + naranja/teal de marca */
+    --sidebar-background: 220 18% 13%; /* Off-Black */
+    --sidebar-foreground: 0 0% 95%; /* Off-White */
+    --sidebar-primary: 23 100% 53%; /* Naranja principal */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 170 100% 21%; /* Aproximación de #006A5B (Forest Teal) */
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 220 7% 30%; /* Cercano a #494C51 */
+    --sidebar-ring: 23 100% 53%;
+    --sidebar-muted: 210 4% 47%; /* Cercano a #76797C */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply text-foreground font-sans antialiased;
+    background-image: url("/images/fondo.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+  }
+
+  .font-mono {
+    font-family: 'Roboto Mono', monospace;
+  }
+}
+
+@layer utilities {
+  .sidebar-gradient {
+    background: linear-gradient(
+      180deg,
+      hsl(220 18% 13%) 0%,
+      hsl(220 24% 10%) 100%
+    );
+  }
+}

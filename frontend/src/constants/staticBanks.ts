@@ -1,0 +1,33 @@
+export const STATIC_BANKS = [
+  // Primer bloque
+  { id: "0001", name: "BANCO CENTRAL DE VENEZUELA" },
+  { id: "0102", name: "BANCO DE VENEZUELA, S.A. BANCO UNIVERSAL" },
+  { id: "0104", name: "BANCO VENEZOLANO DE CRÉDITO, S.A BANCO UNIVERSAL" },
+  { id: "0105", name: "BANCO MERCANTIL C.A., BANCO UNIVERSAL" },
+  { id: "0108", name: "BANCO PROVINCIAL, S.A. BANCO UNIVERSAL" },
+  { id: "0114", name: "BANCO DEL CARIBE C.A., BANCO UNIVERSAL" },
+  { id: "0115", name: "BANCO EXTERIOR C.A., BANCO UNIVERSAL" },
+  { id: "0128", name: "BANCO CARONÍ C.A., BANCO UNIVERSAL" },
+  { id: "0134", name: "BANESCO BANCO UNIVERSAL, C.A." },
+  { id: "0137", name: "BANCO SOFITASA BANCO UNIVERSAL, C.A." },
+  { id: "0138", name: "BANCO PLAZA, BANCO UNIVERSAL" },
+  { id: "0146", name: "BANCO DE LA GENTE EMPRENDEDORA C.A" },
+  // Segundo bloque
+  { id: "0151", name: "BANCO FONDO COMÚN, C.A BANCO UNIVERSAL" },
+  { id: "0156", name: "100% BANCO, BANCO COMERCIAL, C.A" },
+  { id: "0157", name: "DELSUR, BANCO UNIVERSAL C.A." },
+  { id: "0163", name: "BANCO DEL TESORO C.A., BANCO UNIVERSAL" },
+  { id: "0166", name: "BANCO AGRÍCOLA DE VENEZUELA C.A., BANCO UNIVERSAL" },
+  { id: "0168", name: "BANCRECER S.A., BANCO MICROFINANCIERO" },
+  { id: "0169", name: "R4, BANCO MICROFINANCIERO, C.A." },
+  { id: "0171", name: "BANCO ACTIVO C.A., BANCO UNIVERSAL" },
+  { id: "0172", name: "BANCAMIGA BANCO UNIVERSAL, C.A." },
+  { id: "0173", name: "BANCO INTERNACIONAL DE DESARROLLO C.A., BANCO UNIVERSAL" },
+  { id: "0174", name: "BANPLUS BANCO UNIVERSAL, C.A." },
+  { id: "0175", name: "BANCO DIGITAL DE LOS TRABAJADORES, BANCO UNIVERSAL C.A." },
+  { id: "0177", name: "BANCO DE LA FUERZA ARMADA NACIONAL BOLIVARIANA, B.U." },
+  { id: "0178", name: "N58 BANCO DIGITAL, BANCO MICROFINANCIERO" },
+  { id: "0191", name: "BANCO NACIONAL DE CRÉDITO C.A., BANCO UNIVERSAL" },
+  { id: "0601", name: "INSTITUTO MUNICIPAL DE CRÉDITO POPULAR" },
+] as const;
+

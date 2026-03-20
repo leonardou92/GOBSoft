@@ -1,0 +1,348 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum TransactionKind {
+  TRF
+  DEP
+  P2P
+}
+
+/// Proveedor de la API de integración bancaria
+enum BankIntegrationProvider {
+  BNC
+  BDV
+}
+
+/// Entorno de la integración
+enum BankEnvironment {
+  SANDBOX
+  PRODUCTION
+}
+
+/// Tipo de servicio ofrecido por la integración
+enum BankIntegrationService {
+  /// Servicios generales (por ejemplo, lista de bancos, tasas, etc.)
+  GENERAL
+  /// Autenticación inicial / Logon
+  AUTH
+  /// Pagos VPOS
+  VPOS
+  /// Pagos C2P / Pago móvil
+  C2P
+  /// Consultas de movimientos / saldos
+  QUERIES
+}
+
+/// Moneda de la cuenta bancaria
+enum AccountCurrency {
+  VES
+  USD
+  EUR
+}
+
+model BankAccount {
+  id            Int      @id @default(autoincrement())
+  clientId      String   // RIF del cliente (BNC_CLIENT_ID, BNC_CHILD_CLIENT_ID, etc.)
+  accountNumber String   @unique
+  alias         String?  // Nombre amigable de la cuenta (opcional)
+  bankCode      Int      // Código del banco (ej. 191 para BNC)
+  bankId        Int
+  bank          Bank     @relation(fields: [bankId], references: [id])
+
+  /// Moneda de la cuenta (VES, USD, EUR)
+  currency      AccountCurrency @default(VES)
+
+  // Número de Pago Móvil asociado a esta cuenta (ej: 584241234567)
+  mobPaymentPhone String? // null si la cuenta no está afiliada a Pago Móvil
+
+  isActive      Boolean  @default(true)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  transactions  BankTransaction[]
+
+  @@index([bankId])
+}
+
+model Bank {
+  id        Int      @id @default(autoincrement())
+  code      Int      @unique // ej: 191
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts  BankAccount[]
+  configs   BankIntegrationConfig[]
+
+  @@index([isActive])
+  @@index([name])
+}
+
+/// Configuración de integración por banco, servicio y entorno.
+/// Aquí se almacenan las credenciales específicas que exige cada API
+/// (BNC, BDV, etc.) sin hardcodearlas en variables de entorno.
+model BankIntegrationConfig {
+  id Int @id @default(autoincrement())
+
+  bankId Int
+  bank   Bank @relation(fields: [bankId], references: [id])
+
+  /// Proveedor de la integración (BNC, BDV, etc.)
+  provider BankIntegrationProvider
+
+  /// Entorno al que aplica esta configuración (sandbox / producción)
+  environment BankEnvironment
+
+  /// Servicios asociados a esta configuración (relación uno-a-muchos)
+  services BankIntegrationServiceConfig[]
+
+  /// Campos comunes / típicos de las integraciones bancarias
+  /// (no todos serán usados por todos los bancos/servicios)
+  urlBase            String? // URL base del API (ej. https://servicios.bncenlinea.com:16500/api)
+
+  // BNC
+  clientGuid         String? // CLIENT_GUID
+  masterKey          String? // MASTER_KEY (para Logon)
+  clientId           String? // CLIENT_ID (para consultas)
+  affiliationNumber  String? // AFFILIATION_NUMBER (VPOS)
+  terminalId         String? // TERMINAL_ID (C2P)
+
+  // BDV
+  secret             String? // Secret para BDV
+  apiKey             String? // Key / API Key para BDV
+  token              String? // Token para consultas (si se decide persistir)
+
+  /// Campo extra para cosas específicas de cada banco/servicio
+  extra              Json?
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// Evita duplicados para el mismo banco + entorno (una integración lógica con múltiples servicios)
+  @@unique([bankId, environment])
+  @@index([provider])
+  @@index([environment])
+}
+
+/// Relación hijo: servicios habilitados para una integración bancaria
+model BankIntegrationServiceConfig {
+  id              Int                    @id @default(autoincrement())
+  integrationId   Int
+  integration     BankIntegrationConfig  @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  service         BankIntegrationService
+
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  @@unique([integrationId, service])
+  @@index([service])
+}
+
+model BankTransaction {
+  id             Int      @id @default(autoincrement())
+  bankAccountId  Int
+  bankAccount    BankAccount @relation(fields: [bankAccountId], references: [id])
+
+  accountNumber  String
+  movementDate   DateTime
+  controlNumber  String
+  amount         Float
+  code           String
+  bankCode       String
+  debtorInstrument String?
+  concept        String
+  type           String
+  balanceDelta   String
+  referenceA     String?
+  referenceB     String?
+  referenceC     String?
+  referenceD     String?
+
+  /// Orden original dentro del día según lo entregó el BNC
+  externalOrder  Int?
+
+  // Tipo lógico de la transacción (Transferencia, Depósito, Pago Móvil, etc.)
+  kind           TransactionKind @default(TRF)
+
+  // Descripción del tipo de transacción según el código BNC
+  transactionTypeLabel String?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([bankAccountId])
+  @@index([updatedAt])
+  @@index([code])
+  @@index([transactionTypeLabel])
+  @@index([movementDate(sort: Desc)])
+  @@index([movementDate(sort: Desc), externalOrder(sort: Desc), id(sort: Desc)])
+  @@index([accountNumber, movementDate], map: "idx_bank_tx_account_movement_asc")
+  @@index([accountNumber, movementDate(sort: Desc)], map: "idx_bank_tx_account_movement_desc")
+  @@unique([bankAccountId, accountNumber, referenceA, amount, movementDate])
+}
+
+model AssociatedClient {
+  id            Int      @id @default(autoincrement())
+  childClientId String   @unique // RIF del asociado (ChildClientID)
+  name          String
+  description   String?
+  isActive      Boolean  @default(true)
+
+  branches      Branch[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Branch {
+  id                Int              @id @default(autoincrement())
+  code              String           // BranchID (ej: CS400)
+  name              String
+  associatedClientId Int
+  associatedClient  AssociatedClient @relation(fields: [associatedClientId], references: [id])
+  isActive          Boolean          @default(true)
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@unique([associatedClientId, code])
+}
+
+model ApiErrorLog {
+  id        Int      @id @default(autoincrement())
+  context   String
+  message   String
+  name      String?
+  stack     String?
+  extra     Json?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([context, createdAt])
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  isActive     Boolean  @default(true)
+  // Rol "estándar" inicial (legacy). Se mantiene por compatibilidad,
+  // pero la lógica de permisos usa la relación Role dinámica.
+  legacyRole   String?  @default("OPERADOR")
+
+  roleId       Int?
+  role         Role?    @relation(fields: [roleId], references: [id])
+  firstName    String?
+  lastName     String?
+  email        String?  @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  transactionLogs TransactionLog[]
+}
+
+model TransactionLog {
+  id           Int      @id @default(autoincrement())
+
+  context      String
+  operation    String?
+
+  userId       Int?
+  user         User?    @relation(fields: [userId], references: [id])
+
+  accountNumber String?
+  amount        Float?
+  reference     String?
+  status        String?
+  code          String?
+
+  requestPayload  Json?
+  responsePayload Json?
+
+  createdAt   DateTime @default(now())
+
+  @@index([context])
+  @@index([userId])
+  @@index([accountNumber])
+  @@index([reference, amount])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+
+  userId      Int?
+  username    String?
+
+  context     String
+  action      String
+
+  entityType  String?
+  entityId    String?
+
+  description String?
+  metadata    Json?
+
+  ipAddress   String?
+  userAgent   String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([context])
+  @@index([action])
+  @@index([createdAt])
+}
+
+/// Configuración global de seguridad de la aplicación (por ahora, 2FA global para pagos).
+model SecurityConfig {
+  /// Siempre usaremos el registro con id = 1 como configuración global.
+  id                          Int      @id @default(1)
+  globalTwoFactorEnabled      Boolean  @default(false)
+  globalTwoFactorSecretEncrypted String?
+  globalTwoFactorEnabledAt    DateTime?
+
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+}
+
+model Role {
+  id          Int               @id @default(autoincrement())
+  name        String            @unique
+  description String?
+
+  users           User[]
+  rolePermissions RolePermission[]
+}
+
+model Permission {
+  id          Int               @id @default(autoincrement())
+  code        String            @unique
+  description String?
+
+  rolePermissions RolePermission[]
+}
+
+model RolePermission {
+  roleId       Int
+  permissionId Int
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
