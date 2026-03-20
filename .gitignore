@@ -1,15 +1,19 @@
+# Environment files (keep only examples in git)
 .env
 .env.*
 !.env.example
 
-backend/.env
-frontend/.env
+# Dependencies
+backend/node_modules/
+frontend/node_modules/
 
-backend/node_modules
-frontend/node_modules
+# Build artifacts
+backend/dist/
+frontend/dist/
 
-backend/dist
-frontend/dist
+# Logs
+*.log
 
+# OS files
 .DS_Store
 Thumbs.db

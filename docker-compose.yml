@@ -27,13 +27,13 @@ services:
       db:
         condition: service_healthy
     environment:
-      NODE_ENV: development
+      NODE_ENV: ${BACKEND_NODE_ENV:-development}
       PORT: 3000
-      CORS_ORIGIN:
+      CORS_ORIGIN: ${BACKEND_CORS_ORIGIN}
       JWT_SECRET: ${BACKEND_JWT_SECRET}
       JWT_EXPIRES_IN: ${BACKEND_JWT_EXPIRES_IN}
-      TWO_FACTOR_ENCRYPTION_KEY:
-      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE}
+      TWO_FACTOR_ENCRYPTION_KEY: ${BACKEND_TWO_FACTOR_ENCRYPTION_KEY}
+      DATABASE_URL: ${DATABASE_URL}
       STATEMENT_SYNC_CRON: ${BACKEND_STATEMENT_SYNC_CRON}
       INITIAL_SYNC_START_DATE: ${BACKEND_INITIAL_SYNC_START_DATE}
     ports:
@@ -46,6 +46,7 @@ services:
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL}
         VITE_DASHBOARD_HEARTBEAT_MS: ${VITE_DASHBOARD_HEARTBEAT_MS}
+        VITE_APP_VERSION: ${VITE_APP_VERSION}
     container_name: ${PROJECT_NAME:-gobsoft}-frontend
     restart: unless-stopped
     depends_on:

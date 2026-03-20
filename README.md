@@ -40,6 +40,24 @@ curl http://localhost:3000/health
 
 Frontend disponible en `http://localhost:8080` (por defecto).
 
+## Auto deploy al hacer push a main
+
+Existe workflow en `.github/workflows/deploy-main.yml` que despliega automaticamente al servidor cuando hay cambios en `main`.
+
+Configura estos secrets en GitHub (Settings > Secrets and variables > Actions):
+
+- `VPS_HOST`: IP o dominio del servidor Ubuntu.
+- `VPS_USER`: usuario SSH del servidor.
+- `VPS_SSH_KEY`: llave privada SSH (formato OpenSSH).
+- `VPS_PORT`: puerto SSH (opcional, por defecto `22`).
+
+El workflow se conecta por SSH y ejecuta:
+
+```bash
+cd /opt/gobsoft
+./deploy.sh main
+```
+
 ## Seguridad de variables de entorno
 
 - `.env` esta ignorado por Git en raiz, `backend/` y `frontend/`.

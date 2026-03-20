@@ -1,0 +1,37 @@
+name: Auto Deploy Main
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ejecutar deploy remoto por SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -e
+            if [ ! -d "/opt/gobsoft" ]; then
+              sudo mkdir -p /opt/gobsoft
+              sudo chown -R "$USER":"$USER" /opt/gobsoft
+            fi
+
+            if [ ! -f "/opt/gobsoft/deploy.sh" ]; then
+              git clone https://github.com/leonardou92/GOBSoft.git /opt/gobsoft
+            fi
+
+            cd /opt/gobsoft
+            chmod +x deploy.sh
+            ./deploy.sh main
