@@ -6,6 +6,8 @@ COPY package*.json ./
 RUN npm ci
 
 FROM deps AS build
+ARG DATABASE_URL="mysql://root:root@localhost:3306/gobsoft_build"
+ENV DATABASE_URL=${DATABASE_URL}
 COPY . .
 RUN npx prisma generate
 RUN npm run build
